@@ -85,7 +85,7 @@ def build_navbar():
                                         html.A(className="navbar-item",
                                                children=[
                                                          html.P(className="subtitle", 
-                                                         children=['Forecast']
+                                                         children=['Diabetes Prediction']
 
                                                          ),
                                                         ]
@@ -197,7 +197,7 @@ def build_layout():
                         parent_className='custom-tabs',
                         className='tabs is-centered is-boxed',
                         children=[
-                                dcc.Tab(label='Forecast Summary', 
+                                dcc.Tab(label='Data Viz', 
                                         className='custom-tab',
                                         selected_className='custom-tab--selected',
                                         children=get_tab1()
