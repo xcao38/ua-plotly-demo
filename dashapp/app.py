@@ -31,7 +31,42 @@ def get_model(data):
     model = model.fit(X, y)
     return model
 
+def graph_age_hist(data):
+    fig = px.histogram(data, x=data.age, color="target", log_x=False,log_y=False,hover_data=data.columns)
+    fig.update_layout(
+        title_text='Distribution of Age', # title of plot
+        title_x=0.5,
+        xaxis_title_text='Age', # xaxis label
+        yaxis_title_text='Counts', # yaxis label
+        showlegend= True,
+        legend_title_text='Is diabetes'
+    )
+    return fig
 
+def cat_bar_plot(feature, df):
+
+    to_plot = df[[feature,"age","target"]].groupby([feature,"target"]).count().unstack()
+    to_plot.columns = to_plot.columns.droplevel(0)
+    wide_df = px.data.medals_wide()
+
+    fig = px.bar(to_plot,
+#                 color_discrete_sequence=['#008AD9', '#893168'],
+                )
+    fig.update_layout(
+        title={
+            'text':  f"{feature}",
+            'y':0.9,
+            'x':0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'},
+        xaxis_title='Categories',
+        # legend_traceorder="reversed",
+        yaxis_title='Counts',
+        font=dict(size=10,),
+        legend_title="Class",
+        legend={'traceorder':'reversed'}
+    )
+    return fig
 
 data = get_data()
 training_data = clean_data(data)
@@ -61,6 +96,31 @@ def build_navbar():
                   )
     return nav
     
+def get_tab1():
+    return html.Div(children=[
+         html.Div(className="container",
+                children=[html.Div(className="columns",
+                                  children=[
+                                    html.Div(className="column", 
+                                            children = [
+                                        dcc.Graph(id="age-hist-chart", figure=graph_age_hist(data))
+                                      ]),
+                                html.Div(className="column", 
+                                            children = [
+                                                dcc.Dropdown(['polyuria', 'polydipsia', 'sudden_weight_loss', 'weakness',
+                                                            'polyphagia', 'genital_thrush', 'visual_blurring', 'itching',
+                                                            'irritability', 'delayed_healing', 'partial_paresis',
+                                                            'muscle_stiffness', 'alopecia', 
+                                                            'obesity', 'target', 'is_male'], 
+                                                            'polyuria', id='demo-dropdown'),
+                                                dcc.Graph(id="cat-bar-chart")
+
+                     
+                                            ])]),
+                        ])
+                        
+                        ])
+
 
 def get_tab2():
     return html.Div(children=[
@@ -139,7 +199,8 @@ def build_layout():
                         children=[
                                 dcc.Tab(label='Forecast Summary', 
                                         className='custom-tab',
-                                        selected_className='custom-tab--selected'
+                                        selected_className='custom-tab--selected',
+                                        children=get_tab1()
                                        ),
                                 dcc.Tab(label='Prediction', 
                                         className='custom-tab',
@@ -154,6 +215,13 @@ def build_layout():
                             )
                 ])
     return layout
+
+@app.callback(Output("cat-bar-chart", "figure"),
+              Input(component_id='demo-dropdown', component_property='value'),
+             )
+def get_graph(feature):
+    graph = cat_bar_plot(feature, data)
+    return graph
 
 
 @app.callback(Output("ls-loading-output-2", "children"), 
