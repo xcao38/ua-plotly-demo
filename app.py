@@ -74,7 +74,7 @@ training_data = clean_data(data)
 external_stylesheets = ["https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"]
 
 app = Dash(name="Dash-demo", external_stylesheets=external_stylesheets,)
-
+server = app.server
 # ------------------------------------------------------------------------------
 # App layout
 def build_navbar():
