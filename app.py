@@ -1,11 +1,9 @@
 import pandas as pd
 import plotly.express as px  
-import plotly.graph_objects as go
-from dash import Dash, dcc, html, Input, Output 
-import numpy as np
-from sklearn.model_selection import train_test_split
+from dash import Dash, dcc, html, Input, Output, State
 from sklearn.ensemble import RandomForestClassifier
-import time
+
+###################### Utils ##############################
 
 def get_data():
     data = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/00529/diabetes_data_upload.csv")
@@ -71,12 +69,15 @@ def cat_bar_plot(feature, df):
 data = get_data()
 training_data = clean_data(data)
 
+
+###################### App ##############################
+
 external_stylesheets = ["https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"]
 
 app = Dash(name="Dash-demo", external_stylesheets=external_stylesheets,)
 server = app.server
-# ------------------------------------------------------------------------------
-# App layout
+
+
 def build_navbar():
     nav = html.Div(className="navbar",
                         children=[
@@ -85,7 +86,7 @@ def build_navbar():
                                         html.A(className="navbar-item",
                                                children=[
                                                          html.P(className="subtitle", 
-                                                         children=['Diabetes Prediction']
+                                                         children=['Diabetes Prediction App']
 
                                                          ),
                                                         ]
@@ -120,7 +121,6 @@ def get_tab1():
                         ])
                         
                         ])
-
 
 def get_tab2():
     return html.Div(children=[
@@ -181,7 +181,6 @@ def get_tab2():
                         
                         ])
 
-
 def build_layout():
 
     layout =html.Div(
@@ -216,6 +215,9 @@ def build_layout():
                 ])
     return layout
 
+
+################################ Callback ###################################
+
 @app.callback(Output("cat-bar-chart", "figure"),
               Input(component_id='demo-dropdown', component_property='value'),
              )
@@ -225,8 +227,8 @@ def get_graph(feature):
 
 
 @app.callback(Output("ls-loading-output-2", "children"), 
-    [Input(component_id='input-on-Symptoms', component_property='value'),
-     Input(component_id='input-on-age', component_property='value'),
+    [State(component_id='input-on-Symptoms', component_property='value'),
+     State(component_id='input-on-age', component_property='value'),
      Input('submit-val', 'n_clicks'),]
      )
 def input_triggers_nested(selected_symptoms,age,n_clicks):
@@ -253,8 +255,6 @@ def input_triggers_nested(selected_symptoms,age,n_clicks):
         except:
             predicted = "Error: age is required."
     return f"Predicted Value: {predicted}"
-
-
 
 
 app.layout = build_layout()
